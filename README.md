@@ -2,7 +2,10 @@
 
 
 ### Map using a slider
-<iframe src="https://petroleumgis.gitgub.io/portfolio/slide" title="Map with a Slider"></iframe>
+<iframe src='/slide'
+        width='100%' height='400px'>
+
+</iframe>
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
