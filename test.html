@@ -36,7 +36,7 @@
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
                 //  .setHTML(e.features[0].properties.name)
-                .setHTML(e.features[0].properties.api227_OPERATOR + 'TD - ' + e.features[0].properties.api227_FIELD_NAME)
+                .setHTML(e.features[0].properties.api227_OPERATOR + ' Field Name - ' + e.features[0].properties.api227_FIELD_NAME)
                 .addTo(map);
         });
 
