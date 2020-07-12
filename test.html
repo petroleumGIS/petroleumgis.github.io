@@ -35,8 +35,8 @@
         map.on('click', 'Wells', function (e) {
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
-               // .setHTML(e.features[0].properties.name)
-                .setHTML(e.features[0].properties.api227_OPERATOR)
+                .setHTML(e.features[0].properties.name)
+                //.setHTML(e.features[0].properties.api227_OPERATOR)
                 .addTo(map);
         });
 
