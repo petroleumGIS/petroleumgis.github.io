@@ -1,10 +1,10 @@
 ## PetroleumGIS 
 This page is intended to give a few examples of interactive web map applications that are easily buildable and deployable to Web/MacOS/Windows/iOS/Android applications. 
 
-### [Satellite/Street map slider](https://petroleumgis.github.io/portfolio/slide)
+### Satellite/Street map slider
 This map shows an example of showing 2 maps side by side. Some use cases would be showing imagery from different time periods (Before and after), or well development between 2 time periods, or for location comparison (wells with conflicinting lat/longs).
 
-<iframe src='https://petroleumgis.github.io/portfolio/slide' width='100%' height='400px'>
+<iframe src='https://petroleumgis.github.io/portfolio/slide' width='100%' height='400px'></iframe>
 
 ### [Oxy/Laredo Midland Wells](https://petroleumgis.github.io/portfolio/test)
 This map shows an example of wells drilled by Oxy and Laredo in Howard County in the Midland Basin. On clicking a well, attributes from the well can be retrieved such as Field name, but can be altered to retrieve any attributes from source data. 
