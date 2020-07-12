@@ -13,8 +13,7 @@ This map shows an example of wells drilled by Oxy and Laredo in Howard County in
 <iframe src='https://petroleumgis.github.io/portfolio/test' width='100%' height='400px'></iframe>
 
 ### Shale Play locator
-This map shows various shale play outlines as defined by the EIA. Some use cases for this map would be to display information for map features such as State/County outlines when selected showing production/wellcounts values
-
+This map shows various shale play outlines as defined by the EIA. The data in the hover box pulls from the source data such as well counts, production values, feature details, etc.
 
 <iframe src='https://petroleumgis.github.io/portfolio/plays' width='100%' height='400px'></iframe>
 
