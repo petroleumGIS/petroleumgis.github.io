@@ -31,6 +31,23 @@
             zoom: 11 // starting zoom
         });
         map.addControl(new mapboxgl.NavigationControl());
+
+        map.on('click', 'Laredo', function (e) {
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(e.features[0].properties.name)
+                .addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'Laredo', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'Laredo', function () {
+            map.getCanvas().style.cursor = '';
+        });
     </script>
 
 </body>
