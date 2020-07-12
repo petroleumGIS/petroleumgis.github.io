@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Swipe between maps</title>
+    <title>Swipe between maps Example</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css" rel="stylesheet" />
@@ -54,15 +54,15 @@
 var beforeMap = new mapboxgl.Map({
 container: 'before',
     style: 'mapbox://styles/petroleumgis/ckcipp70a2i051irudbf2t81z',
-center: [0, 0],
-zoom: 0
+    center: [-101.447, 32.279], // starting position [lng, lat]
+    zoom: 11 // starting zoom
 });
 
 var afterMap = new mapboxgl.Map({
 container: 'after',
     style: 'mapbox://styles/petroleumgis/ckcff5rjj02va1inxob9au9kf',
-center: [0, 0],
-zoom: 0
+    center: [-101.447, 32.279], // starting position [lng, lat]
+    zoom: 11 // starting zoom
 });
 
 // A selector or reference to HTML element
