@@ -4,7 +4,9 @@
 ### [Map using a slider]('https://petroleumgis.github.io/portfolio/slide')
 
 
-</iframe>
+### [Map using popups]('https://petroleumgis.github.io/portfolio/test')
+
+
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
@@ -28,7 +30,7 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-##[MAP](https://petroleumgis.github.io/portfolio/test)##
+[MAP](https://petroleumgis.github.io/portfolio/test)
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/petroleumGIS/portfolio/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
