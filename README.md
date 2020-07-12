@@ -1,7 +1,7 @@
 ## PetroleumGIS 
 This page is intended to give a few examples of interactive web map applications that are easily buildable and deployable to Web/MacOS/Windows/iOS/Android applications. 
 
-### Satellite/Street map slider
+### Wiper Map
 This map shows an example of showing 2 maps side by side. Some use cases would be showing imagery from different time periods (Before and after), or well development between 2 time periods, or for location comparison (wells with conflicinting lat/longs).
 
 <iframe src='https://petroleumgis.github.io/portfolio/slide' width='100%' height='400px'></iframe>
