@@ -25,47 +25,10 @@ var map = new mapboxgl.Map({
 container: 'map',
 style: 'mapbox://styles/petroleumgis/ckcff5rjj02va1inxob9au9kf',
 center: [32.321,-101.354],
-zoom: 11
+zoom: 8
 });
  
-map.on('load', function() {
-// Add a source for the state polygons.
-map.addSource('wells', {
-'type': 'geojson',
-'data':
-'https://petroleumgis.github.io/portfolio/wells.geojson'
-});
  
-// Add a layer showing the state polygons.
-map.addLayer({
-'id': 'wells-layer',
-'type': 'circle',
-'source': 'wells',
-'paint': {
-'fill-color': 'rgba(200, 100, 240, 0.4)',
-'fill-outline-color': 'rgba(200, 100, 240, 1)'
-}
-});
- 
-// When a click event occurs on a feature in the states layer, open a popup at the
-// location of the click, with description HTML from its properties.
-map.on('click', 'wells-layer', function(e) {
-new mapboxgl.Popup()
-.setLngLat(e.lngLat)
-.setHTML(e.features[0].properties.name)
-.addTo(map);
-});
- 
-// Change the cursor to a pointer when the mouse is over the states layer.
-map.on('mouseenter', 'wells-layer', function() {
-map.getCanvas().style.cursor = 'pointer';
-});
- 
-// Change it back to a pointer when it leaves.
-map.on('mouseleave', 'wells-layer', function() {
-map.getCanvas().style.cursor = '';
-});
-});
 </script>
  
 </body>
