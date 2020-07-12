@@ -1,9 +1,8 @@
 ## Welcome to John's Portfolio'
 
 
-### Map using a slider
-<iframe src='/slide'
-        width='100%' height='400px'>
+### [Map using a slider]('https://petroleumgis.github.io/portfolio/slide')
+
 
 </iframe>
 
