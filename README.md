@@ -1,5 +1,5 @@
-## Welcome to John's Portfolio
-
+## PetroleumGIS 
+This page is intended to give a few examples of interactive web map applications that are easily buildable and deployable to web applications. 
 
 ### [Satellite/Street map slider](https://petroleumgis.github.io/portfolio/slide)
 This map shows an example of showing 2 maps side by side. Some use cases would be showing imagery from different time periods (Before and after), or well development between 2 time periods, or for location comparison (wells with conflicinting lat/longs).
