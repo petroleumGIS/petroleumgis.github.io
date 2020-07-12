@@ -1,10 +1,10 @@
 ## Welcome to John's Portfolio'
 
 
-### [Map using a slider]('/slide')
+### [Map using a slider](/slide)
 
 
-### [Map using popups]('/test')
+### [Map using popups](/test)
 
 
 
