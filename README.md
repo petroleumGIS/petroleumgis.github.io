@@ -1,10 +1,8 @@
-## Welcome to GitHub Pages
+## Welcome to John's Portfolio'
 
-You can use the [editor on GitHub](https://github.com/petroleumGIS/portfolio/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
+### Map using a slider
+<iframe src="https://petroleumgis.gitgub.io/portfolio/slide" title="Map with a Slider"></iframe>
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
