@@ -23,9 +23,9 @@ font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
 	mapboxgl.accessToken = 'pk.eyJ1IjoicGV0cm9sZXVtZ2lzIiwiYSI6ImNrOGRxZmwyMzBlM3YzZm1rZTF1N3Z2YXoifQ.1KnSJpKmxmPSgTmkc1KC7Q';
 var map = new mapboxgl.Map({
 container: 'map',
-style: 'mapbox://styles/mapbox/streets-v11',
-center: [-100.04, 38.907],
-zoom: 3
+style: 'mapbox://styles/petroleumgis/ckcff5rjj02va1inxob9au9kf',
+center: [32.321,-101.354],
+zoom: 11
 });
  
 map.on('load', function() {
@@ -38,9 +38,9 @@ map.addSource('states', {
  
 // Add a layer showing the state polygons.
 map.addLayer({
-'id': 'states-layer',
-'type': 'fill',
-'source': 'states',
+'id': 'wells-layer',
+'type': 'circle',
+'source': 'wells',
 'paint': {
 'fill-color': 'rgba(200, 100, 240, 0.4)',
 'fill-outline-color': 'rgba(200, 100, 240, 1)'
@@ -49,7 +49,7 @@ map.addLayer({
  
 // When a click event occurs on a feature in the states layer, open a popup at the
 // location of the click, with description HTML from its properties.
-map.on('click', 'states-layer', function(e) {
+map.on('click', 'wells-layer', function(e) {
 new mapboxgl.Popup()
 .setLngLat(e.lngLat)
 .setHTML(e.features[0].properties.name)
