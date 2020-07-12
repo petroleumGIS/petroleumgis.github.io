@@ -6,11 +6,20 @@ This map shows an example of showing 2 maps side by side. Some use cases would b
 
 <iframe src='https://petroleumgis.github.io/portfolio/slide' width='100%' height='400px'></iframe>
 
-### [Oxy/Laredo Midland Wells](https://petroleumgis.github.io/portfolio/test)
+### Oxy/Laredo Midland Wells
 This map shows an example of wells drilled by Oxy and Laredo in Howard County in the Midland Basin. On clicking a well, attributes from the well can be retrieved such as Field name, but can be altered to retrieve any attributes from source data. 
 
-### [Shale Play locator](https://petroleumgis.github.io/portfolio/plays)
+
+<iframe src='https://petroleumgis.github.io/portfolio/test' width='100%' height='400px'></iframe>
+
+### Shale Play locator
 This map shows various shale play outlines as defined by the EIA. Some use cases for this map would be to display information for map features such as State/County outlines when selected showing production/wellcounts values
 
-### [Flyaround Map example](https://petroleumgis.github.io/portfolio/slideshow)
+
+<iframe src='https://petroleumgis.github.io/portfolio/plays' width='100%' height='400px'></iframe>
+
+### Flyaround Map example
 This is an example map which cycles between features (in this case, Borough outlines of NYC) and displays a small writeup for each as it cycles through. The map automatically pans/zooms to each area for a few seconds before going on to the next area. 
+
+
+<iframe src='https://petroleumgis.github.io/portfolio/slideshow' width='100%' height='400px'></iframe>
