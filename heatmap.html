@@ -35,18 +35,18 @@
         map.on('click', 'meteorite strikes', function (e) {
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
-                //  .setHTML(e.features[0].properties.name)
-                .setHTML(e.features[0].properties.name + ' - ' + e.features[0].properties.mass (g) + 'g')
+                //  .setHTML(e.features[1].properties.name)
+                .setHTML(e.features[1].properties.name + ' - ' + e.features[0].properties.mass (g) + 'g')
                 .addTo(map);
         });
 
         // Change the cursor to a pointer when the mouse is over the wells layer.
-        map.on('mouseenter', 'meteorite strikes', function () {
+        map.on('mouseenter', 'meteorite strikes value', function () {
             map.getCanvas().style.cursor = 'pointer';
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'meteorite strikes', function () {
+        map.on('mouseleave', 'meteorite strikes value', function () {
             map.getCanvas().style.cursor = '';
         });
     </script>
