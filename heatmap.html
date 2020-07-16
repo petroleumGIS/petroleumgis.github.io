@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Popup Example</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGV0cm9sZXVtZ2lzIiwiYSI6ImNrOGRxZmwyMzBlM3YzZm1rZTF1N3Z2YXoifQ.1KnSJpKmxmPSgTmkc1KC7Q';
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/petroleumgis/ckcjpw15549a21ildf2y3zkd8/draft', // stylesheet location
+            center: [-101.447, 32.279], // starting position [lng, lat]
+            zoom: 11 // starting zoom
+        });
+        map.addControl(new mapboxgl.NavigationControl());
+
+        map.on('click', 'meteorite strikes', function (e) {
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                //  .setHTML(e.features[0].properties.name)
+                .setHTML(e.features[0].properties.name + ' - ' + e.features[0].properties.mass (g) + 'g')
+                .addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the wells layer.
+        map.on('mouseenter', 'meteorite strikes', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'meteorite strikes', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    </script>
+
+</body>
+</html>

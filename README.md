@@ -6,6 +6,13 @@ This map shows an example of showing 2 maps side by side. Some use cases would b
 
 <iframe src='https://petroleumgis.github.io/portfolio/slide' width='100%' height='400px'></iframe>
 
+### Heatmap
+This map shows an example of a heatmap using meteorite strikes worldwide. Custom color palettes, radius, etc can be adjusted on the backend as needed. On clicking a meteor strike location,  you can see the name of the meteorite and its weight in grams. 
+
+
+<iframe src='https://petroleumgis.github.io/portfolio/heatmap' width='100%' height='400px'></iframe>
+
+
 ### Oxy/Laredo Midland Wells
 This map shows an example of wells drilled by Oxy and Laredo in Howard County in the Midland Basin. On clicking a well, attributes from the well can be retrieved such as Field name, but can be altered to retrieve any attributes from source data. 
 
