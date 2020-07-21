@@ -27,40 +27,25 @@
         var map = new mapboxgl.Map({
             container: 'map', // container id
             style: 'mapbox://styles/petroleumgis/ckcjpw15549a21ildf2y3zkd8/draft', // stylesheet location
-            center: [-101.447, 32.279], // starting position [lng, lat]
-            zoom: 11 // starting zoom
-
-        mapboxgl.accessToken = 'pk.eyJ1IjoicGV0cm9sZXVtZ2lzIiwiYSI6ImNrY29tNzBzYzA1OTUyd210N2k4OTU0eTEifQ.fVgNOeXoa3yq8hMXvCkNYA';
-        var map = new mapboxgl.Map({
-            container: 'map', // container id
-            style: 'mapbox://styles/petroleumgis/ckcjpw15549a21ildf2y3zkd8/draft', // stylesheet location
             center: [-95.936, 37.512], // starting position [lng, lat]
             zoom: 3.79 // starting zoom
-
         });
         map.addControl(new mapboxgl.NavigationControl());
 
         map.on('click', 'meteorite strikes', function (e) {
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
-
-                //  .setHTML(e.features[0].properties.name)
-                .setHTML(e.features[0].properties.name + ' - ' + e.features[0].properties.mass (g) + 'g')
-
                 //  .setHTML(e.features[1].properties.name)
                 .setHTML(e.features[1].properties.name + ' - ' + e.features[0].properties.mass (g) + 'g')
                 .addTo(map);
         });
 
         // Change the cursor to a pointer when the mouse is over the wells layer.
-        map.on('mouseenter', 'meteorite strikes', function () {
         map.on('mouseenter', 'meteorite strikes value', function () {
             map.getCanvas().style.cursor = 'pointer';
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'meteorite strikes', function () {
-
         map.on('mouseleave', 'meteorite strikes value', function () {
             map.getCanvas().style.cursor = '';
         });
