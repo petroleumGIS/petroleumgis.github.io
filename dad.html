@@ -1,1 +1,78 @@
-Hello world
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Today</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .date {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .time {
+      font-size: 72px;
+      font-weight: bold;
+    }
+
+    .weather {
+      font-size: 40px;
+    }
+
+    .calendar-title {
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    .event {
+      font-size: 36px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="section">
+    <div class="date" id="date"></div>
+    <div class="time" id="time"></div>
+  </div>
+
+  <div class="section">
+    <div class="weather" id="weather">
+      Weather: Loading...
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="calendar-title">Today</div>
+    <div class="event">Lunch with Mary – 12:00 PM</div>
+    <div class="event">Doctor – 2:30 PM</div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("time").textContent =
+        now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+      document.getElementById("date").textContent =
+        now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+
+</body>
+</html>
