@@ -11,54 +11,38 @@
       --muted: #3a3a3a;
       --accent: #0a7cff;
       --good: #128a12;
-      --bad: #b00020;
       --card: #f6f6f6;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body {
-      margin: 0; padding: 28px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg); color: var(--fg);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 28px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 24px 28px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    }
+    body { margin: 0; padding: 28px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--fg); }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 28px; max-width: 1100px; margin: 0 auto; }
+    .section { background: var(--card); border-radius: 18px; padding: 24px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
 
     .greeting { font-size: 44px; font-weight: 800; margin: 0 0 8px; }
     .date { font-size: 28px; color: var(--muted); margin: 0 0 6px; }
     .time { font-size: 80px; font-weight: 800; letter-spacing: 1px; margin: 0; }
 
-    .weather-title, .calendar-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; }
+    .weather-title, .calendar-title, .nextup-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; }
     .weather-row { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
     .weather-now { font-size: 42px; font-weight: 700; }
     .weather-detail { font-size: 28px; color: var(--muted); }
     .weather-updated { font-size: 18px; color: var(--muted); margin-top: 6px; }
 
+    .nextup { border-left: 10px solid var(--accent); }
+    .nextup-main { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .nextup-time { font-size: 42px; font-weight: 800; }
+    .nextup-titleline { font-size: 38px; font-weight: 700; }
+    .nextup-meta { font-size: 24px; color: var(--muted); }
+
     .events { margin-top: 10px; }
-    .event {
-      font-size: 30px; padding: 14px 16px; border-radius: 12px; background: #fff;
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
-      border-left: 8px solid var(--accent);
-    }
+    .event { font-size: 30px; padding: 14px 16px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-left: 8px solid var(--accent); }
     .event-time { font-weight: 700; }
     .event-title { margin-left: 12px; flex: 1; }
     .event-meta { color: var(--muted); font-size: 20px; margin-left: 12px; }
     .empty { font-size: 28px; color: var(--muted); background: #fff; border-radius: 12px; padding: 16px; }
-
     .footer-note { font-size: 16px; color: var(--muted); text-align: center; margin-top: 6px; }
+
     @media (min-width: 900px) {
       .grid { grid-template-columns: 1.1fr 0.9fr; }
       .time { font-size: 96px; }
@@ -78,10 +62,18 @@
     <section class="section">
       <div class="weather-title">Weather</div>
       <div class="weather-row">
-        <div class="weather-now" id="weatherNow">Loading…</div>
-        <div class="weather-detail" id="weatherDetail"></div>
+        <div class="weather-now" id="weatherNow">Searching for location…</div>
+        <div class="weather-detail" id="weatherDetail">Please allow location when prompted.</div>
       </div>
       <div class="weather-updated" id="weatherUpdated"></div>
+    </section>
+
+    <!-- NEXT UP (spans full width) -->
+    <section class="section nextup" style="grid-column: 1 / -1;">
+      <div class="nextup-title">Next up</div>
+      <div id="nextUpBody" class="nextup-main">
+        <div class="empty">Looking for today’s events…</div>
+      </div>
     </section>
 
     <!-- Calendar -->
@@ -95,53 +87,53 @@
   </div>
 
   <script>
-    // ----------------- CONFIG: UPDATE THESE -----------------
+    // --------------- CONFIG: UPDATE THESE ---------------
     const CONFIG = {
-      // Weather (Open-Meteo): set your latitude/longitude
-      LAT: 29.7604,  // ⬅ replace with your area
-      LON: -95.3698, // ⬅ replace with your area
-      // Google Calendar (Public calendar, API key restricted to your GitHub Pages domain)
-      GOOGLE_CALENDAR_ID: "your_calendar_id@group.calendar.google.com", // ⬅ replace
-      GOOGLE_API_KEY: "YOUR_PUBLICLY_RESTRICTED_API_KEY", // ⬅ replace
-      // Refresh intervals (ms)
-      WEATHER_REFRESH_MS: 15 * 60 * 1000, // 15 minutes
-      CAL_REFRESH_MS: 5 * 60 * 1000,      // 5 minutes
-      // Format
-      SHOW_PAST_TODAY: true // show earlier-today events too
-    };
-    // --------------------------------------------------------
+      // Fallback location (used if permission denied / timeout).
+      LAT: 29.7604,       // fallback latitude
+      LON: -95.3698,      // fallback longitude
 
-    // High-contrast, simple greeting
+      // Google Calendar (Public calendar with read-only access) — placeholders for now
+      GOOGLE_CALENDAR_ID: "your_calendar_id@group.calendar.google.com", // <-- replace later
+      GOOGLE_API_KEY: "YOUR_RESTRICTED_API_KEY",                         // <-- replace later
+
+      // Refresh intervals (ms)
+      WEATHER_REFRESH_MS: 15 * 60 * 1000,
+      CAL_REFRESH_MS: 5 * 60 * 1000,
+
+      // Geolocation behavior
+      GEO_TIMEOUT_MS: 10000,  // stop waiting after 10s
+      GEO_CACHE_HOURS: 24,    // reuse last approved location to avoid prompts
+
+      // Calendar rendering
+      SHOW_PAST_TODAY: true   // include earlier-today items
+    };
+    // ---------------------------------------------------
+
+    // Greeting / Date / Time
     function greetingForHour(h) {
       if (h >= 5 && h < 12) return "Good morning";
       if (h >= 12 && h < 17) return "Good afternoon";
       if (h >= 17 && h < 22) return "Good evening";
       return "Good night";
     }
-
     function updateClock() {
       const now = new Date();
-      document.getElementById("time").textContent =
-        now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      document.getElementById("date").textContent =
-        now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+      document.getElementById("time").textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      document.getElementById("date").textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
       document.getElementById("greeting").textContent = greetingForHour(now.getHours());
     }
 
-    // Weather via Open-Meteo (no key)
-    // API docs: https://open-meteo.com/ (no auth, CORS enabled, great for static hosting)
+    // Weather via Open-Meteo (no API key)
     const WCODE = {
-      0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-      45: "Fog", 48: "Fog",
-      51: "Drizzle", 53: "Drizzle", 55: "Drizzle", 56: "Freezing drizzle", 57: "Freezing drizzle",
-      61: "Rain", 63: "Rain", 65: "Rain",
-      66: "Freezing rain", 67: "Freezing rain",
-      71: "Snow", 73: "Snow", 75: "Snow", 77: "Snow grains",
-      80: "Rain showers", 81: "Rain showers", 82: "Rain showers",
-      85: "Snow showers", 86: "Snow showers",
-      95: "Thunderstorm", 96: "Thunderstorm", 99: "Thunderstorm"
+      0:"Clear",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Fog",
+      51:"Drizzle",53:"Drizzle",55:"Drizzle",56:"Freezing drizzle",57:"Freezing drizzle",
+      61:"Rain",63:"Rain",65:"Rain",66:"Freezing rain",67:"Freezing rain",
+      71:"Snow",73:"Snow",75:"Snow",77:"Snow grains",
+      80:"Rain showers",81:"Rain showers",82:"Rain showers",
+      85:"Snow showers",86:"Snow showers",
+      95:"Thunderstorm",96:"Thunderstorm",99:"Thunderstorm"
     };
-
     async function fetchWeather() {
       const url = new URL("https://api.open-meteo.com/v1/forecast");
       const params = {
@@ -162,10 +154,10 @@
         const dMin = Math.round(data.daily.temperature_2m_min[0]);
         document.getElementById("weatherNow").textContent = `${nowW}, ${nowT}°F`;
         document.getElementById("weatherDetail").textContent = `Today: High ${dMax}° / Low ${dMin}°`;
-        document.getElementById("weatherUpdated").textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`;
+        document.getElementById("weatherUpdated").textContent =
+          `Updated ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`;
         localStorage.setItem("weather_cache", JSON.stringify({ t: Date.now(), payload: { nowW, nowT, dMax, dMin } }));
-      } catch (e) {
-        // fallback to cache
+      } catch {
         const cache = localStorage.getItem("weather_cache");
         if (cache) {
           const { payload } = JSON.parse(cache);
@@ -173,34 +165,112 @@
           document.getElementById("weatherDetail").textContent = `Today: High ${payload.dMax}° / Low ${payload.dMin}°`;
         } else {
           document.getElementById("weatherNow").textContent = "Weather unavailable";
+          document.getElementById("weatherDetail").textContent = "";
         }
       }
     }
 
-    // Google Calendar: fetch PUBLIC calendar events for TODAY
-    // Uses events.list with API key (public calendars require no OAuth). See docs. 
+    // Google Calendar (public, no OAuth)
     function todayBoundsISO() {
-      // Use the tablet's local timezone (kiosk) to define "today"
       const start = new Date(); start.setHours(0,0,0,0);
       const end = new Date();   end.setHours(23,59,59,999);
       return { timeMin: start.toISOString(), timeMax: end.toISOString() };
     }
-
     function formatEventTime(ev) {
       const start = ev.start.dateTime || ev.start.date;
       const end   = ev.end.dateTime   || ev.end.date;
-      const allDay = !!ev.start.date; // Google uses 'date' (YYYY-MM-DD) for all-day
+      const allDay = !!ev.start.date;
       if (allDay) return "All day";
       const s = new Date(start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const e = new Date(end).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       return `${s} – ${e}`;
     }
 
+    // NEXT UP helpers
+    let TODAY_EVENTS = [];
+    function parseTimes(ev) {
+      const allDay = !!ev.start.date;
+      let start = allDay ? new Date(ev.start.date + "T00:00:00") : new Date(ev.start.dateTime);
+      let end   = allDay ? new Date(ev.end.date   + "T00:00:00") : new Date(ev.end.dateTime);
+      // For all-day events, Google sets end to next day 00:00; adjust "today" window
+      if (allDay) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const tomorrow = new Date(today.getTime() + 24*3600*1000);
+        // constrain to today only
+        start = today; end = tomorrow;
+      }
+      return { start, end, allDay };
+    }
+    function humanCountdown(ms) {
+      if (ms < 0) ms = 0;
+      const mins = Math.round(ms / 60000);
+      if (mins < 60) return `in ${mins} min`;
+      const hrs = Math.floor(mins / 60);
+      const rem = mins % 60;
+      if (rem === 0) return `in ${hrs} hr`;
+      return `in ${hrs} hr ${rem} min`;
+    }
+    function computeNextUp(items) {
+      const now = Date.now();
+      let current = null;
+      let upcoming = null;
+
+      for (const ev of items) {
+        const { start, end, allDay } = parseTimes(ev);
+        const s = +start, e = +end;
+        // ongoing (including all-day today)
+        if (s <= now && now < e) {
+          if (!current || e < +parseTimes(current).end) current = ev;
+        } else if (s > now) {
+          if (!upcoming || s < +parseTimes(upcoming).start) upcoming = ev;
+        }
+      }
+
+      if (current) return { type: "now", event: current };
+      if (upcoming) return { type: "upcoming", event: upcoming };
+      return { type: "none", event: null };
+    }
+    function renderNextUp() {
+      const body = document.getElementById("nextUpBody");
+      if (!TODAY_EVENTS || TODAY_EVENTS.length === 0) {
+        body.innerHTML = `<div class="empty">Nothing scheduled for the rest of today.</div>`;
+        return;
+      }
+      const picked = computeNextUp(TODAY_EVENTS);
+      if (picked.type === "none") {
+        body.innerHTML = `<div class="empty">Nothing scheduled for the rest of today.</div>`;
+        return;
+      }
+
+      const ev = picked.event;
+      const { start, end, allDay } = parseTimes(ev);
+      const title = ev.summary || "(No title)";
+
+      if (picked.type === "now") {
+        const until = allDay ? "All day" :
+          `until ${end.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+        body.innerHTML = `
+          <div class="nextup-time">Now</div>
+          <div class="nextup-titleline">${title}</div>
+          <div class="nextup-meta">${until}${ev.location ? ` • ${ev.location}` : ""}</div>
+        `;
+      } else {
+        const at = allDay ? "All day" :
+          `${start.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+        const countdown = allDay ? "" : ` (${humanCountdown(+start - Date.now())})`;
+        body.innerHTML = `
+          <div class="nextup-time">${allDay ? "" : "At "}${at}</div>
+          <div class="nextup-titleline">${title}</div>
+          <div class="nextup-meta">${allDay ? "All day" : `Starts${countdown}`}${ev.location ? ` • ${ev.location}` : ""}</div>
+        `;
+      }
+    }
+
     async function fetchCalendarToday() {
       const eventsEl = document.getElementById("events");
       const { timeMin, timeMax } = todayBoundsISO();
       const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CONFIG.GOOGLE_CALENDAR_ID)}/events`;
-      const url = `${base}?key=${encodeURIComponent(CONFIG.GOOGLE_API_KEY)}&singleEvents=true&orderBy=startTime&showDeleted=false&maxResults=25&timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}`;
+      const url = `${base}?key=${encodeURIComponent(CONFIG.GOOGLE_API_KEY)}&singleEvents=true&orderBy=startTime&showDeleted=false&maxResults=50&timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}`;
 
       try {
         const r = await fetch(url, { cache: "no-store" });
@@ -208,14 +278,16 @@
         const data = await r.json();
         let items = data.items || [];
 
-        // Optionally include earlier-today items (we already pulled the full day; this is just presentation)
         if (!CONFIG.SHOW_PAST_TODAY) {
           const now = Date.now();
           items = items.filter(ev => {
-            const start = ev.start.dateTime ? new Date(ev.start.dateTime).getTime() : now - 1; // keep all-day
-            return start >= now || !!ev.start.date;
+            const t = ev.start.dateTime ? new Date(ev.start.dateTime).getTime() : now - 1;
+            return t >= now || !!ev.start.date;
           });
         }
+
+        TODAY_EVENTS = items.slice(); // keep for "Next up"
+        renderNextUp();
 
         eventsEl.innerHTML = "";
         if (!items.length) {
@@ -227,21 +299,21 @@
             const loc = ev.location ? `<span class="event-meta">• ${ev.location}</span>` : "";
             const div = document.createElement("div");
             div.className = "event";
-            div.innerHTML = `
-              <div class="event-time">${timeTxt}</div>
-              <div class="event-title">${title}${loc}</div>
-            `;
+            div.innerHTML = `<div class="event-time">${timeTxt}</div><div class="event-title">${title}${loc}</div>`;
             eventsEl.appendChild(div);
           }
         }
         document.getElementById("calUpdated").textContent =
           `Calendar updated ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`;
         localStorage.setItem("calendar_cache", JSON.stringify({ t: Date.now(), payload: items }));
-      } catch (e) {
+      } catch {
         const cache = localStorage.getItem("calendar_cache");
+        eventsEl.innerHTML = "";
         if (cache) {
           const items = JSON.parse(cache).payload || [];
-          eventsEl.innerHTML = "";
+          TODAY_EVENTS = items.slice();
+          renderNextUp();
+
           if (!items.length) eventsEl.innerHTML = `<div class="empty">Calendar unavailable.</div>`;
           else {
             for (const ev of items) {
@@ -256,24 +328,76 @@
           }
           document.getElementById("calUpdated").textContent = `Calendar (cached)`;
         } else {
+          TODAY_EVENTS = [];
+          renderNextUp();
           eventsEl.innerHTML = `<div class="empty">Calendar unavailable.</div>`;
         }
       }
     }
 
-    // Optional: keep the tablet screen awake (Fully Kiosk also has settings for this)
-    async function requestWakeLock() {
+    // Geolocation: wait for GPS before first weather fetch; cache for the day
+    function hasRecentGeoCache() {
+      const cached = localStorage.getItem('device_location_cache');
+      if (!cached) return null;
       try {
-        if ('wakeLock' in navigator) await navigator.wakeLock.request('screen');
-      } catch (_) { /* ignore */ }
+        const obj = JSON.parse(cached);
+        const fresh = (Date.now() - obj.t) < CONFIG.GEO_CACHE_HOURS * 3600 * 1000;
+        return fresh ? obj : null;
+      } catch { return null; }
+    }
+    function requestDeviceLocation() {
+      return new Promise((resolve) => {
+        if (!('geolocation' in navigator)) return resolve(null);
+        const opts = { enableHighAccuracy: true, timeout: CONFIG.GEO_TIMEOUT_MS, maximumAge: 0 };
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }),
+          () => resolve(null),
+          opts
+        );
+      });
     }
 
-    // Init
-    updateClock();
-    setInterval(updateClock, 1000);
-    fetchWeather(); setInterval(fetchWeather, CONFIG.WEATHER_REFRESH_MS);
-    fetchCalendarToday(); setInterval(fetchCalendarToday, CONFIG.CAL_REFRESH_MS);
-    requestWakeLock();
+    async function startDashboard() {
+      // Clock runs immediately
+      updateClock(); setInterval(updateClock, 1000);
+
+      // NEXT UP should update every minute (countdown)
+      setInterval(renderNextUp, 60 * 1000);
+
+      // Try cached device location first (no prompt)
+      const cached = hasRecentGeoCache();
+      if (cached) {
+        CONFIG.LAT = cached.lat; CONFIG.LON = cached.lon;
+        document.getElementById("weatherDetail").textContent = `Using saved location`;
+        await fetchWeather();
+      } else {
+        // Show searching message; request location once
+        document.getElementById("weatherNow").textContent = "Searching for location…";
+        document.getElementById("weatherDetail").textContent = "Please allow location when prompted.";
+        const loc = await requestDeviceLocation();
+        if (loc) {
+          CONFIG.LAT = loc.lat; CONFIG.LON = loc.lon;
+          localStorage.setItem("device_location_cache", JSON.stringify({ lat: loc.lat, lon: loc.lon, t: Date.now() }));
+          document.getElementById("weatherDetail").textContent = `Location found`;
+          await fetchWeather();
+        } else {
+          // Fallback: use configured defaults quietly
+          document.getElementById("weatherNow").textContent = "Using default location";
+          document.getElementById("weatherDetail").textContent = "";
+          await fetchWeather();
+        }
+      }
+
+      // Set periodic refreshes
+      setInterval(fetchWeather, CONFIG.WEATHER_REFRESH_MS);
+      fetchCalendarToday(); setInterval(fetchCalendarToday, CONFIG.CAL_REFRESH_MS);
+
+      // Optional: keep screen on (if supported)
+      try { if ('wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch {}
+    }
+
+    // Boot
+    startDashboard();
   </script>
 </body>
 </html>
