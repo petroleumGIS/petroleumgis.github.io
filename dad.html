@@ -1,78 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Today</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #3a3a3a;
+      --accent: #0a7cff;
+      --good: #128a12;
+      --bad: #b00020;
+      --card: #f6f6f6;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      color: #000000;
-      margin: 0;
-      padding: 40px;
+      margin: 0; padding: 28px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg); color: var(--fg);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
     .section {
-      margin-bottom: 40px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     }
 
-    .date {
-      font-size: 48px;
-      font-weight: bold;
-    }
+    .greeting { font-size: 44px; font-weight: 800; margin: 0 0 8px; }
+    .date { font-size: 28px; color: var(--muted); margin: 0 0 6px; }
+    .time { font-size: 80px; font-weight: 800; letter-spacing: 1px; margin: 0; }
 
-    .time {
-      font-size: 72px;
-      font-weight: bold;
-    }
+    .weather-title, .calendar-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; }
+    .weather-row { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+    .weather-now { font-size: 42px; font-weight: 700; }
+    .weather-detail { font-size: 28px; color: var(--muted); }
+    .weather-updated { font-size: 18px; color: var(--muted); margin-top: 6px; }
 
-    .weather {
-      font-size: 40px;
-    }
-
-    .calendar-title {
-      font-size: 42px;
-      font-weight: bold;
-    }
-
+    .events { margin-top: 10px; }
     .event {
-      font-size: 36px;
-      margin-top: 15px;
+      font-size: 30px; padding: 14px 16px; border-radius: 12px; background: #fff;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+      border-left: 8px solid var(--accent);
+    }
+    .event-time { font-weight: 700; }
+    .event-title { margin-left: 12px; flex: 1; }
+    .event-meta { color: var(--muted); font-size: 20px; margin-left: 12px; }
+    .empty { font-size: 28px; color: var(--muted); background: #fff; border-radius: 12px; padding: 16px; }
+
+    .footer-note { font-size: 16px; color: var(--muted); text-align: center; margin-top: 6px; }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1.1fr 0.9fr; }
+      .time { font-size: 96px; }
     }
   </style>
 </head>
 <body>
+  <div class="grid">
+    <!-- Clock / Greeting -->
+    <section class="section">
+      <div class="greeting" id="greeting">Good evening</div>
+      <div class="date" id="date">Saturday, March 14</div>
+      <div class="time" id="time">9:41 PM</div>
+    </section>
 
-  <div class="section">
-    <div class="date" id="date"></div>
-    <div class="time" id="time"></div>
-  </div>
+    <!-- Weather -->
+    <section class="section">
+      <div class="weather-title">Weather</div>
+      <div class="weather-row">
+        <div class="weather-now" id="weatherNow">Loading…</div>
+        <div class="weather-detail" id="weatherDetail"></div>
+      </div>
+      <div class="weather-updated" id="weatherUpdated"></div>
+    </section>
 
-  <div class="section">
-    <div class="weather" id="weather">
-      Weather: Loading...
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="calendar-title">Today</div>
-    <div class="event">Lunch with Mary – 12:00 PM</div>
-    <div class="event">Doctor – 2:30 PM</div>
+    <!-- Calendar -->
+    <section class="section" style="grid-column: 1 / -1;">
+      <div class="calendar-title">Today’s Schedule</div>
+      <div class="events" id="events">
+        <div class="empty">Loading calendar…</div>
+      </div>
+      <div class="footer-note" id="calUpdated"></div>
+    </section>
   </div>
 
   <script>
-    function updateTime() {
+    // ----------------- CONFIG: UPDATE THESE -----------------
+    const CONFIG = {
+      // Weather (Open-Meteo): set your latitude/longitude
+      LAT: 29.7604,  // ⬅ replace with your area
+      LON: -95.3698, // ⬅ replace with your area
+      // Google Calendar (Public calendar, API key restricted to your GitHub Pages domain)
+      GOOGLE_CALENDAR_ID: "your_calendar_id@group.calendar.google.com", // ⬅ replace
+      GOOGLE_API_KEY: "YOUR_PUBLICLY_RESTRICTED_API_KEY", // ⬅ replace
+      // Refresh intervals (ms)
+      WEATHER_REFRESH_MS: 15 * 60 * 1000, // 15 minutes
+      CAL_REFRESH_MS: 5 * 60 * 1000,      // 5 minutes
+      // Format
+      SHOW_PAST_TODAY: true // show earlier-today events too
+    };
+    // --------------------------------------------------------
+
+    // High-contrast, simple greeting
+    function greetingForHour(h) {
+      if (h >= 5 && h < 12) return "Good morning";
+      if (h >= 12 && h < 17) return "Good afternoon";
+      if (h >= 17 && h < 22) return "Good evening";
+      return "Good night";
+    }
+
+    function updateClock() {
       const now = new Date();
       document.getElementById("time").textContent =
         now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-
       document.getElementById("date").textContent =
         now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+      document.getElementById("greeting").textContent = greetingForHour(now.getHours());
     }
 
-    updateTime();
-    setInterval(updateTime, 1000);
-  </script>
+    // Weather via Open-Meteo (no key)
+    // API docs: https://open-meteo.com/ (no auth, CORS enabled, great for static hosting)
+    const WCODE = {
+      0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+      45: "Fog", 48: "Fog",
+      51: "Drizzle", 53: "Drizzle", 55: "Drizzle", 56: "Freezing drizzle", 57: "Freezing drizzle",
+      61: "Rain", 63: "Rain", 65: "Rain",
+      66: "Freezing rain", 67: "Freezing rain",
+      71: "Snow", 73: "Snow", 75: "Snow", 77: "Snow grains",
+      80: "Rain showers", 81: "Rain showers", 82: "Rain showers",
+      85: "Snow showers", 86: "Snow showers",
+      95: "Thunderstorm", 96: "Thunderstorm", 99: "Thunderstorm"
+    };
 
+    async function fetchWeather() {
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+      const params = {
+        latitude: CONFIG.LAT,
+        longitude: CONFIG.LON,
+        current: "temperature_2m,weather_code",
+        daily: "temperature_2m_max,temperature_2m_min,weather_code",
+        temperature_unit: "fahrenheit",
+        timezone: "auto"
+      };
+      Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+      try {
+        const r = await fetch(url.toString(), { cache: "no-store" });
+        const data = await r.json();
+        const nowT = Math.round(data.current.temperature_2m);
+        const nowW = WCODE[data.current.weather_code] || "—";
+        const dMax = Math.round(data.daily.temperature_2m_max[0]);
+        const dMin = Math.round(data.daily.temperature_2m_min[0]);
+        document.getElementById("weatherNow").textContent = `${nowW}, ${nowT}°F`;
+        document.getElementById("weatherDetail").textContent = `Today: High ${dMax}° / Low ${dMin}°`;
+        document.getElementById("weatherUpdated").textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`;
+        localStorage.setItem("weather_cache", JSON.stringify({ t: Date.now(), payload: { nowW, nowT, dMax, dMin } }));
+      } catch (e) {
+        // fallback to cache
+        const cache = localStorage.getItem("weather_cache");
+        if (cache) {
+          const { payload } = JSON.parse(cache);
+          document.getElementById("weatherNow").textContent = `${payload.nowW}, ${payload.nowT}°F (cached)`;
+          document.getElementById("weatherDetail").textContent = `Today: High ${payload.dMax}° / Low ${payload.dMin}°`;
+        } else {
+          document.getElementById("weatherNow").textContent = "Weather unavailable";
+        }
+      }
+    }
+
+    // Google Calendar: fetch PUBLIC calendar events for TODAY
+    // Uses events.list with API key (public calendars require no OAuth). See docs. 
+    function todayBoundsISO() {
+      // Use the tablet's local timezone (kiosk) to define "today"
+      const start = new Date(); start.setHours(0,0,0,0);
+      const end = new Date();   end.setHours(23,59,59,999);
+      return { timeMin: start.toISOString(), timeMax: end.toISOString() };
+    }
+
+    function formatEventTime(ev) {
+      const start = ev.start.dateTime || ev.start.date;
+      const end   = ev.end.dateTime   || ev.end.date;
+      const allDay = !!ev.start.date; // Google uses 'date' (YYYY-MM-DD) for all-day
+      if (allDay) return "All day";
+      const s = new Date(start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const e = new Date(end).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return `${s} – ${e}`;
+    }
+
+    async function fetchCalendarToday() {
+      const eventsEl = document.getElementById("events");
+      const { timeMin, timeMax } = todayBoundsISO();
+      const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CONFIG.GOOGLE_CALENDAR_ID)}/events`;
+      const url = `${base}?key=${encodeURIComponent(CONFIG.GOOGLE_API_KEY)}&singleEvents=true&orderBy=startTime&showDeleted=false&maxResults=25&timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}`;
+
+      try {
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) throw new Error("Calendar fetch failed");
+        const data = await r.json();
+        let items = data.items || [];
+
+        // Optionally include earlier-today items (we already pulled the full day; this is just presentation)
+        if (!CONFIG.SHOW_PAST_TODAY) {
+          const now = Date.now();
+          items = items.filter(ev => {
+            const start = ev.start.dateTime ? new Date(ev.start.dateTime).getTime() : now - 1; // keep all-day
+            return start >= now || !!ev.start.date;
+          });
+        }
+
+        eventsEl.innerHTML = "";
+        if (!items.length) {
+          eventsEl.innerHTML = `<div class="empty">Nothing scheduled for today.</div>`;
+        } else {
+          for (const ev of items) {
+            const timeTxt = formatEventTime(ev);
+            const title = ev.summary || "(No title)";
+            const loc = ev.location ? `<span class="event-meta">• ${ev.location}</span>` : "";
+            const div = document.createElement("div");
+            div.className = "event";
+            div.innerHTML = `
+              <div class="event-time">${timeTxt}</div>
+              <div class="event-title">${title}${loc}</div>
+            `;
+            eventsEl.appendChild(div);
+          }
+        }
+        document.getElementById("calUpdated").textContent =
+          `Calendar updated ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`;
+        localStorage.setItem("calendar_cache", JSON.stringify({ t: Date.now(), payload: items }));
+      } catch (e) {
+        const cache = localStorage.getItem("calendar_cache");
+        if (cache) {
+          const items = JSON.parse(cache).payload || [];
+          eventsEl.innerHTML = "";
+          if (!items.length) eventsEl.innerHTML = `<div class="empty">Calendar unavailable.</div>`;
+          else {
+            for (const ev of items) {
+              const timeTxt = formatEventTime(ev);
+              const title = ev.summary || "(No title)";
+              const loc = ev.location ? `<span class="event-meta">• ${ev.location}</span>` : "";
+              const div = document.createElement("div");
+              div.className = "event";
+              div.innerHTML = `<div class="event-time">${timeTxt}</div><div class="event-title">${title}${loc}</div>`;
+              eventsEl.appendChild(div);
+            }
+          }
+          document.getElementById("calUpdated").textContent = `Calendar (cached)`;
+        } else {
+          eventsEl.innerHTML = `<div class="empty">Calendar unavailable.</div>`;
+        }
+      }
+    }
+
+    // Optional: keep the tablet screen awake (Fully Kiosk also has settings for this)
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) await navigator.wakeLock.request('screen');
+      } catch (_) { /* ignore */ }
+    }
+
+    // Init
+    updateClock();
+    setInterval(updateClock, 1000);
+    fetchWeather(); setInterval(fetchWeather, CONFIG.WEATHER_REFRESH_MS);
+    fetchCalendarToday(); setInterval(fetchCalendarToday, CONFIG.CAL_REFRESH_MS);
+    requestWakeLock();
+  </script>
 </body>
 </html>
